@@ -1,168 +1,171 @@
 import { formatElapsed, timeSince, getEventLabel } from '../utils';
 
-const TYPE_CONFIG = {
-  pee:         { emoji: '💧', label: 'Pee',          bg: 'bg-sky-50',    border: 'border-sky-200',    pill: 'bg-sky-500',    text: 'text-sky-700'    },
-  poop:        { emoji: '💩', label: 'Poop',         bg: 'bg-amber-50',  border: 'border-amber-200',  pill: 'bg-amber-500',  text: 'text-amber-700'  },
-  feed:        { emoji: '🍼', label: 'Feed',         bg: 'bg-rose-50',   border: 'border-rose-200',   pill: 'bg-rose-500',   text: 'text-rose-700'   },
-  sleep:       { emoji: '😴', label: 'Sleep',        bg: 'bg-violet-50', border: 'border-violet-200', pill: 'bg-violet-500', text: 'text-violet-700' },
-  hygiene:     { emoji: '🛁', label: 'Hygiene',      bg: 'bg-teal-50',   border: 'border-teal-200',   pill: 'bg-teal-500',   text: 'text-teal-700'   },
-  diaper_care: { emoji: '🧴', label: 'Diaper Care',  bg: 'bg-pink-50',   border: 'border-pink-200',   pill: 'bg-pink-500',   text: 'text-pink-700'   },
-  dress:       { emoji: '👗', label: 'Dress Change', bg: 'bg-fuchsia-50', border: 'border-fuchsia-200', pill: 'bg-fuchsia-500', text: 'text-fuchsia-700' },
-  pump:        { emoji: '🍼', label: 'Mom Pump',     bg: 'bg-pink-50',    border: 'border-pink-200',    pill: 'bg-pink-500',    text: 'text-pink-700'    },
+const TYPE = {
+  pee:         { emoji: '💧', label: 'Pee',         grad: 'from-sky-400 to-blue-500'       },
+  poop:        { emoji: '💩', label: 'Poop',        grad: 'from-amber-400 to-orange-500'   },
+  feed:        { emoji: '🍼', label: 'Feed',        grad: 'from-rose-400 to-pink-600'      },
+  sleep:       { emoji: '😴', label: 'Sleep',       grad: 'from-violet-500 to-purple-700'  },
+  hygiene:     { emoji: '🛁', label: 'Hygiene',     grad: 'from-teal-400 to-cyan-600'      },
+  diaper_care: { emoji: '🧴', label: 'Diaper Care', grad: 'from-pink-400 to-rose-500'      },
+  dress:       { emoji: '👗', label: 'Dress',       grad: 'from-fuchsia-400 to-purple-500' },
+  pump:        { emoji: '🍼', label: 'Mom Pump',    grad: 'from-pink-300 to-rose-400'      },
 };
 
-function ActionButton({ type, label, sublabel, onClick, active }) {
-  const c = TYPE_CONFIG[type];
+function BigActionBtn({ type, label, sublabel, onClick, active }) {
+  const t = TYPE[type];
   return (
     <button onClick={onClick}
-      className={`relative flex flex-col items-center justify-center gap-2 rounded-3xl border-2
-        active:scale-95 transition-all duration-100 select-none
-        ${c.bg} ${active ? c.border + ' shadow-lg' : 'border-transparent shadow-sm'}`}
-      style={{ minHeight: 110 }}>
-      {active && <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${c.pill} animate-pulse`} />}
-      <span className="text-5xl leading-none">{c.emoji}</span>
-      <div className="text-center px-1">
-        <p className={`text-sm font-bold ${c.text}`}>{label}</p>
-        {sublabel && <p className="text-xs text-gray-400 mt-0.5 leading-tight">{sublabel}</p>}
+      className={`relative flex flex-col items-center justify-center gap-2 rounded-3xl p-5
+        bg-gradient-to-br ${t.grad} shadow-lg
+        active:scale-95 transition-all duration-150 select-none overflow-hidden`}
+      style={{ minHeight: 130 }}>
+      {/* Shine overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none rounded-3xl" />
+      {active && (
+        <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+      )}
+      <span className="text-5xl leading-none drop-shadow-sm">{t.emoji}</span>
+      <div className="text-center z-10">
+        <p className="text-sm font-bold text-white drop-shadow">{label}</p>
+        {sublabel && <p className="text-xs text-white/70 mt-0.5 leading-tight px-1">{sublabel}</p>}
       </div>
     </button>
   );
 }
 
-function SmallButton({ type, label, onClick }) {
-  const c = TYPE_CONFIG[type];
+function CareBtn({ type, onClick }) {
+  const t = TYPE[type];
   return (
     <button onClick={onClick}
-      className={`flex items-center justify-center gap-2 rounded-2xl border border-transparent
-        ${c.bg} active:scale-95 transition-all duration-100 px-4 py-3`}>
-      <span className="text-2xl">{c.emoji}</span>
-      <span className={`text-sm font-bold ${c.text}`}>{label}</span>
+      className={`flex flex-col items-center gap-1.5 py-3.5 rounded-2xl
+        bg-white/8 border border-white/10 active:scale-95 transition-all duration-150 select-none`}>
+      <span className="text-2xl">{t.emoji}</span>
+      <span className="text-xs font-semibold text-white/70">{t.label}</span>
     </button>
   );
 }
 
-function StatPill({ type, value, last }) {
-  const c = TYPE_CONFIG[type];
+function StatCard({ type, value, lastEvent }) {
+  const t = TYPE[type];
   return (
-    <div className={`flex items-center gap-3 ${c.bg} rounded-2xl px-4 py-3 border ${c.border}`}>
-      <div className={`w-10 h-10 rounded-xl ${c.pill} flex items-center justify-center text-xl shrink-0`}>
-        {c.emoji}
-      </div>
-      <div className="min-w-0">
-        <div className="flex items-baseline gap-1.5">
-          <span className={`text-2xl font-black ${c.text}`}>{value}</span>
-          <span className="text-xs text-gray-400 font-medium">today</span>
-        </div>
-        <p className="text-xs text-gray-400 truncate">{last ? `Last ${timeSince(last.createdAt)}` : 'None yet'}</p>
-      </div>
+    <div className={`rounded-2xl p-4 bg-gradient-to-br ${t.grad} relative overflow-hidden`}>
+      <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+      <p className="text-3xl font-black text-white">{value}</p>
+      <p className="text-xs text-white/80 font-medium mt-0.5">{t.label}</p>
+      <p className="text-xs text-white/60 mt-1">{lastEvent ? timeSince(lastEvent.createdAt) : '—'}</p>
     </div>
   );
 }
 
-function RecentItem({ event }) {
-  const c = TYPE_CONFIG[event.type] || TYPE_CONFIG.feed;
+function RecentRow({ event }) {
+  const t = TYPE[event.type] || TYPE.feed;
   const time = new Date(event.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const details = [];
-  if (event.burped === true) details.push('burped ✓');
-  if (event.burped === false) details.push('no burp');
-  if (event.poopColor) details.push(event.poopColor);
-  if (event.texture) details.push(event.texture);
-  if (event.washType) details.push({ full_bath: 'Full Bath', sponge_bath: 'Sponge', butt_water: 'Butt Wash', wipe: 'Wipe' }[event.washType] || event.washType);
-  if (event.type === 'pump' && event.quantity) details.push(`${event.quantity}ml`);
-  if (event.dressType) details.push({ footie: 'Footie', longsleeve_pants: 'LS+Pants', shortsleeeve_pants: 'SS+Pants', longsleeeve_shorts: 'LS+Shorts', onesie_short: 'Onesie', swaddle: 'Swaddle', just_diaper: 'Diaper only' }[event.dressType] || event.dressType);
-  if (event.rashLevel && event.rashLevel !== 'none') details.push(`rash: ${event.rashLevel}`);
-  if (event.ointmentApplied) details.push(event.ointmentName || 'ointment ✓');
-  if (event.notes) details.push(event.notes);
+  const label = getEventLabel(event);
+
+  const tags = [];
+  if (event.burped === true)  tags.push('burped ✓');
+  if (event.burped === false) tags.push('no burp');
+  if (event.poopColor)        tags.push(event.poopColor);
+  if (event.texture)          tags.push(event.texture);
+  if (event.side && event.type === 'feed') tags.push(event.side);
+  if (event.quantity)         tags.push(`${event.quantity}ml`);
+  if (event.washType)         tags.push({ full_bath: 'Full Bath', sponge_bath: 'Sponge', butt_water: 'Butt Wash', wipe: 'Wipe' }[event.washType] || event.washType);
+  if (event.rashLevel && event.rashLevel !== 'none') tags.push(`rash: ${event.rashLevel}`);
+  if (event.notes)            tags.push(event.notes);
 
   return (
     <div className="flex items-center gap-3 py-3 px-4">
-      <span className="text-xl shrink-0">{c.emoji}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-800 truncate">{getEventLabel(event)}</p>
-        {details.length > 0 && <p className="text-xs text-gray-400 truncate">{details.join(' · ')}</p>}
+      <div className={`w-9 h-9 rounded-2xl bg-gradient-to-br ${t.grad} flex items-center justify-center text-lg shrink-0 shadow-sm`}>
+        {t.emoji}
       </div>
-      <span className="text-xs text-gray-400 shrink-0 font-medium">{time}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-900 truncate">{label}</p>
+        {tags.length > 0 && (
+          <div className="flex gap-1 mt-0.5 flex-wrap">
+            {tags.slice(0, 3).map((tag, i) => (
+              <span key={i} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+      <span className="text-xs text-gray-400 shrink-0 font-medium tabular-nums">{time}</span>
     </div>
   );
 }
 
 export default function Dashboard({ stats, events, activeSleep, tick, onPee, onPoop, onFeed, onSleepToggle, onHygiene, onDiaperCare, onDress, onPump }) {
   const todayEvents = events.filter(e => new Date(e.createdAt).toDateString() === new Date().toDateString());
-  const lastOf = (type) => events.find(e => e.type === type);
+  const lastOf = type => events.find(e => e.type === type);
 
   const sleepDisplay = stats.sleepMinutes > 0
     ? (Math.floor(stats.sleepMinutes / 60) > 0
-        ? `${Math.floor(stats.sleepMinutes / 60)}h ${stats.sleepMinutes % 60 > 0 ? stats.sleepMinutes % 60 + 'm' : ''}`
+        ? `${Math.floor(stats.sleepMinutes / 60)}h${stats.sleepMinutes % 60 > 0 ? stats.sleepMinutes % 60 + 'm' : ''}`
         : `${stats.sleepMinutes}m`)
     : '0';
 
-  const sleepSublabel = activeSleep ? `Sleeping · ${formatElapsed(activeSleep.createdAt)}` : 'Tap to start';
+  const sleepSub = activeSleep ? formatElapsed(activeSleep.createdAt) : 'tap to start';
 
   return (
-    <div className="px-4 pt-4 pb-6 space-y-6">
+    <div className="pb-8">
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <StatPill type="pee"  value={stats.pee}   last={lastOf('pee')} />
-        <StatPill type="poop" value={stats.poop}  last={lastOf('poop')} />
-        <StatPill type="feed" value={stats.feeds} last={lastOf('feed')} />
-        <div className="flex items-center gap-3 bg-violet-50 rounded-2xl px-4 py-3 border border-violet-200">
-          <div className="w-10 h-10 rounded-xl bg-violet-500 flex items-center justify-center text-xl shrink-0">😴</div>
-          <div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-black text-violet-700">{sleepDisplay}</span>
-              <span className="text-xs text-gray-400 font-medium">today</span>
-            </div>
-            <p className="text-xs text-gray-400">
-              {activeSleep
-                ? `Since ${new Date(activeSleep.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                : 'No active sleep'}
-            </p>
-          </div>
+      {/* Stats strip */}
+      <div className="px-4 pt-4 grid grid-cols-4 gap-2">
+        <StatCard type="pee"   value={stats.pee}   lastEvent={lastOf('pee')}  />
+        <StatCard type="poop"  value={stats.poop}  lastEvent={lastOf('poop')} />
+        <StatCard type="feed"  value={stats.feeds} lastEvent={lastOf('feed')} />
+        <div className={`rounded-2xl p-4 bg-gradient-to-br from-violet-500 to-purple-700 relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+          <p className="text-2xl font-black text-white leading-tight">{sleepDisplay}</p>
+          <p className="text-xs text-white/80 font-medium mt-0.5">Sleep</p>
+          {activeSleep && <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
         </div>
       </div>
 
-      {/* Main quick log buttons */}
-      <div>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Quick Log</p>
+      {/* Main action buttons */}
+      <div className="px-4 mt-5">
+        <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Quick Log</p>
         <div className="grid grid-cols-2 gap-3">
-          <ActionButton type="pee"  label="Pee"  sublabel="Tap to log" onClick={onPee} />
-          <ActionButton type="poop" label="Poop" sublabel="Tap for details" onClick={onPoop} />
-          <ActionButton type="feed" label="Feed" sublabel="Breast / Bottled / Formula" onClick={onFeed} />
-          <ActionButton type="sleep"
+          <BigActionBtn type="pee"   label="Pee"   sublabel="Tap to log instantly"      onClick={onPee} />
+          <BigActionBtn type="poop"  label="Poop"  sublabel="Tap to add details"        onClick={onPoop} />
+          <BigActionBtn type="feed"  label="Feed"  sublabel="Breast · Bottled · Formula" onClick={onFeed} />
+          <BigActionBtn type="sleep"
             label={activeSleep ? 'Stop Sleep' : 'Sleep'}
-            sublabel={sleepSublabel}
+            sublabel={sleepSub}
             onClick={onSleepToggle}
             active={!!activeSleep} />
         </div>
       </div>
 
-      {/* Secondary care buttons */}
-      <div>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Care</p>
-        <div className="grid grid-cols-2 gap-2">
-          <SmallButton type="hygiene"     label="Hygiene"     onClick={onHygiene} />
-          <SmallButton type="diaper_care" label="Diaper Care" onClick={onDiaperCare} />
-          <SmallButton type="dress"       label="Dress"       onClick={onDress} />
-          <SmallButton type="pump"        label="Mom Pump"    onClick={onPump} />
+      {/* Care strip */}
+      <div className="px-4 mt-5">
+        <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Care</p>
+        <div className="grid grid-cols-4 gap-2">
+          <CareBtn type="hygiene"     onClick={onHygiene} />
+          <CareBtn type="diaper_care" onClick={onDiaperCare} />
+          <CareBtn type="dress"       onClick={onDress} />
+          <CareBtn type="pump"        onClick={onPump} />
         </div>
       </div>
 
-      {/* Recent */}
+      {/* Recent activity */}
       {todayEvents.length > 0 && (
-        <div>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Today's Activity</p>
-          <div className="bg-white rounded-3xl shadow-sm overflow-hidden divide-y divide-gray-50">
-            {todayEvents.slice(0, 10).map(event => <RecentItem key={event.id} event={event} />)}
+        <div className="px-4 mt-5">
+          <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Today</p>
+          <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
+            {todayEvents.slice(0, 10).map(event => (
+              <div key={event.id} className="border-b border-gray-50 last:border-0">
+                <RecentRow event={event} />
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {todayEvents.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-5xl mb-3">👶</p>
-          <p className="font-semibold text-gray-400">Nothing logged today yet</p>
-          <p className="text-sm text-gray-300 mt-1">Tap the buttons above to start tracking</p>
+        <div className="text-center py-16">
+          <p className="text-6xl mb-4">👶</p>
+          <p className="font-bold text-white/60">Nothing logged today</p>
+          <p className="text-sm text-white/30 mt-1">Tap the buttons above</p>
         </div>
       )}
     </div>

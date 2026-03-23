@@ -178,18 +178,25 @@ export default function App() {
     : `${ageDays}d old`;
 
   return (
-    <div className="flex flex-col min-h-svh" style={{ background: '#f8f4ff' }}>
-      <header className="sticky top-0 z-10 px-5 pt-4 pb-3 flex items-center justify-between"
-        style={{ background: 'rgba(248,244,255,0.92)', backdropFilter: 'blur(12px)' }}>
+    <div className="flex flex-col min-h-svh" style={{ background: '#0f0a1e' }}>
+
+      {/* Header */}
+      <header className="sticky top-0 z-10 px-5 pt-5 pb-4 flex items-center justify-between"
+        style={{ background: 'rgba(15,10,30,0.85)', backdropFilter: 'blur(20px)' }}>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl">👶</span>
-            <h1 className="text-xl font-black text-gray-900 tracking-tight">Avika</h1>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-pink-500 flex items-center justify-center text-base shadow-lg">
+              👶
+            </div>
+            <h1 className="text-xl font-black text-white tracking-tight">Avika</h1>
+            <span className="text-xs font-semibold bg-white/10 text-white/70 px-2.5 py-1 rounded-full">
+              {ageStr}
+            </span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5 ml-8">{ageStr} · {dateStr}</p>
+          <p className="text-xs text-white/30 mt-1.5 ml-10">{dateStr}</p>
         </div>
         <button onClick={() => setModal('settings')}
-          className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-lg active:scale-95 transition-transform border border-gray-100">
+          className="w-10 h-10 rounded-2xl glass flex items-center justify-center text-lg active:scale-95 transition-transform">
           ⚙️
         </button>
       </header>
@@ -219,19 +226,21 @@ export default function App() {
         {tab === 'analytics' && <Analytics events={events} />}
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-10"
-        style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #f0eaff' }}>
-        <div className="flex">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-10 px-4 pb-4"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div className="glass flex rounded-3xl overflow-hidden shadow-2xl">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 py-3.5 flex flex-col items-center gap-0.5 text-xs font-semibold transition-colors
-                ${tab === t.id ? 'text-violet-700' : 'text-gray-400'}`}>
+              className={`flex-1 py-3.5 flex flex-col items-center gap-0.5 text-xs font-semibold transition-all
+                ${tab === t.id ? 'text-white' : 'text-white/30'}`}>
+              {tab === t.id && (
+                <span className="absolute w-8 h-0.5 bg-gradient-to-r from-violet-400 to-pink-400 rounded-full -mt-3.5" />
+              )}
               <span className="text-xl leading-none">{t.icon}</span>
               <span>{t.label}</span>
             </button>
           ))}
         </div>
-        <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
       </nav>
 
       {modal === 'feed' && (

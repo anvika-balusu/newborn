@@ -6,17 +6,33 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
+  * {
+    -webkit-font-smoothing: antialiased;
+  }
   body {
     margin: 0;
     padding: 0;
-    background: #fdf4ff;
+    background: #0f0a1e;
     font-family: system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
   }
   #root {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
     min-height: 100svh;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .glass-light {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 }
