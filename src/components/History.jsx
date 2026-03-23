@@ -23,6 +23,15 @@ function EventDetail({ event }) {
     if (event.duration) details.push(`${event.duration}min`);
     if (event.burped !== undefined) details.push(event.burped ? 'burped ✓' : 'no burp');
   }
+  if (event.type === 'pump') {
+    if (event.side === 'both') {
+      if (event.leftMl) details.push(`L: ${event.leftMl}ml`);
+      if (event.rightMl) details.push(`R: ${event.rightMl}ml`);
+    } else if (event.quantity) {
+      details.push(`${event.quantity}ml`);
+    }
+    if (event.duration) details.push(`${event.duration}min`);
+  }
   if (event.type === 'dress') {
     const labels = { footie: 'Footie', longsleeve_pants: 'Long Sleeve + Pants', shortsleeeve_pants: 'Short Sleeve + Pants', longsleeeve_shorts: 'Long Sleeve + Shorts', onesie_short: 'Onesie', swaddle: 'Swaddle', just_diaper: 'Diaper only' };
     if (event.dressType) details.push(labels[event.dressType] || event.dressType);

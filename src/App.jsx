@@ -7,6 +7,7 @@ import QuickLogModal from './components/QuickLogModal';
 import HygieneModal from './components/HygieneModal';
 import DiaperCareModal from './components/DiaperCareModal';
 import DressModal from './components/DressModal';
+import PumpModal from './components/PumpModal';
 import SettingsModal from './components/SettingsModal';
 import { getEvents, saveEvent, updateEvent, deleteEvent, getTodayStats } from './store';
 import './index.css';
@@ -27,6 +28,7 @@ function TypePickerModal({ onClose, onSelect }) {
     { type: 'hygiene',     emoji: '🛁', label: 'Hygiene'      },
     { type: 'diaper_care', emoji: '🧴', label: 'Diaper Care'  },
     { type: 'dress',       emoji: '👗', label: 'Dress Change' },
+    { type: 'pump',        emoji: '🍼', label: 'Mom Pump'     },
   ];
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
@@ -203,6 +205,7 @@ export default function App() {
             onHygiene={() => { setEditingEvent(null); setModal('hygiene'); }}
             onDiaperCare={() => { setEditingEvent(null); setModal('diaper_care'); }}
             onDress={() => { setEditingEvent(null); setModal('dress'); }}
+            onPump={() => { setEditingEvent(null); setModal('pump'); }}
           />
         )}
         {tab === 'history' && (
@@ -246,6 +249,10 @@ export default function App() {
       {modal === 'sleep' && (
         <SleepMissedModal event={editingEvent} onClose={closeModal}
           onSave={(data, time) => handleSave('sleep', data, time)} />
+      )}
+      {modal === 'pump' && (
+        <PumpModal event={editingEvent} onClose={closeModal}
+          onSave={(data, time) => handleSave('pump', data, time)} />
       )}
       {modal === 'dress' && (
         <DressModal event={editingEvent} onClose={closeModal}

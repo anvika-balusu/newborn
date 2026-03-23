@@ -9,6 +9,7 @@ const ALL_TYPES = [
   { type: 'hygiene',     emoji: '🛁', label: 'Hygiene'     },
   { type: 'diaper_care', emoji: '🧴', label: 'Diaper Care' },
   { type: 'dress',       emoji: '👗', label: 'Dress'       },
+  { type: 'pump',        emoji: '🍼', label: 'Mom Pump'    },
 ];
 
 function TypeCheckboxes({ selected, onChange, counts }) {

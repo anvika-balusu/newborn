@@ -7,7 +7,8 @@ const TYPE_CONFIG = {
   sleep:       { emoji: '😴', label: 'Sleep',        bg: 'bg-violet-50', border: 'border-violet-200', pill: 'bg-violet-500', text: 'text-violet-700' },
   hygiene:     { emoji: '🛁', label: 'Hygiene',      bg: 'bg-teal-50',   border: 'border-teal-200',   pill: 'bg-teal-500',   text: 'text-teal-700'   },
   diaper_care: { emoji: '🧴', label: 'Diaper Care',  bg: 'bg-pink-50',   border: 'border-pink-200',   pill: 'bg-pink-500',   text: 'text-pink-700'   },
-  dress:       { emoji: '👗', label: 'Dress Change', bg: 'bg-fuchsia-50',border: 'border-fuchsia-200',pill: 'bg-fuchsia-500',text: 'text-fuchsia-700'},
+  dress:       { emoji: '👗', label: 'Dress Change', bg: 'bg-fuchsia-50', border: 'border-fuchsia-200', pill: 'bg-fuchsia-500', text: 'text-fuchsia-700' },
+  pump:        { emoji: '🍼', label: 'Mom Pump',     bg: 'bg-pink-50',    border: 'border-pink-200',    pill: 'bg-pink-500',    text: 'text-pink-700'    },
 };
 
 function ActionButton({ type, label, sublabel, onClick, active }) {
@@ -67,6 +68,7 @@ function RecentItem({ event }) {
   if (event.poopColor) details.push(event.poopColor);
   if (event.texture) details.push(event.texture);
   if (event.washType) details.push({ full_bath: 'Full Bath', sponge_bath: 'Sponge', butt_water: 'Butt Wash', wipe: 'Wipe' }[event.washType] || event.washType);
+  if (event.type === 'pump' && event.quantity) details.push(`${event.quantity}ml`);
   if (event.dressType) details.push({ footie: 'Footie', longsleeve_pants: 'LS+Pants', shortsleeeve_pants: 'SS+Pants', longsleeeve_shorts: 'LS+Shorts', onesie_short: 'Onesie', swaddle: 'Swaddle', just_diaper: 'Diaper only' }[event.dressType] || event.dressType);
   if (event.rashLevel && event.rashLevel !== 'none') details.push(`rash: ${event.rashLevel}`);
   if (event.ointmentApplied) details.push(event.ointmentName || 'ointment ✓');
@@ -84,7 +86,7 @@ function RecentItem({ event }) {
   );
 }
 
-export default function Dashboard({ stats, events, activeSleep, tick, onPee, onPoop, onFeed, onSleepToggle, onHygiene, onDiaperCare, onDress }) {
+export default function Dashboard({ stats, events, activeSleep, tick, onPee, onPoop, onFeed, onSleepToggle, onHygiene, onDiaperCare, onDress, onPump }) {
   const todayEvents = events.filter(e => new Date(e.createdAt).toDateString() === new Date().toDateString());
   const lastOf = (type) => events.find(e => e.type === type);
 
@@ -138,10 +140,11 @@ export default function Dashboard({ stats, events, activeSleep, tick, onPee, onP
       {/* Secondary care buttons */}
       <div>
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Care</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <SmallButton type="hygiene"     label="Hygiene"     onClick={onHygiene} />
           <SmallButton type="diaper_care" label="Diaper Care" onClick={onDiaperCare} />
           <SmallButton type="dress"       label="Dress"       onClick={onDress} />
+          <SmallButton type="pump"        label="Mom Pump"    onClick={onPump} />
         </div>
       </div>
 

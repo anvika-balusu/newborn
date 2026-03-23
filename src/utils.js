@@ -56,6 +56,7 @@ export function getEventIcon(type) {
     hygiene:     '🛁',
     diaper_care: '🧴',
     dress:       '👗',
+    pump:        '🍼',
     note:        '📝',
     weight:      '⚖️',
     temperature: '🌡️',
@@ -90,6 +91,17 @@ export function getEventLabel(event) {
     case 'weight': return event.weight ? `Weight · ${event.weight}g` : 'Weight';
     case 'temperature': return event.temp ? `Temp · ${event.temp}°C` : 'Temperature';
     case 'medicine': return event.medicineName || 'Medicine';
+    case 'pump': {
+      const parts = [];
+      if (event.side) parts.push(event.side === 'both' ? 'Both sides' : event.side === 'left' ? 'Left' : 'Right');
+      if (event.side === 'both' && (event.leftMl || event.rightMl)) {
+        parts.push(`L:${event.leftMl || 0}ml R:${event.rightMl || 0}ml`);
+      } else if (event.quantity) {
+        parts.push(`${event.quantity}ml`);
+      }
+      if (event.duration) parts.push(`${event.duration}min`);
+      return `Pump · ${parts.join(' · ')}`;
+    }
     case 'dress': {
       const labels = {
         footie:              'Footie / Sleepsuit',
