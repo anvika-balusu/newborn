@@ -67,20 +67,18 @@ function download(content, filename, mime) {
   URL.revokeObjectURL(url);
 }
 
-export function importJSON(file) {
+// Parse a JSON backup file and return events + per-type counts (does NOT import yet)
+export function parseImportFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target.result);
-        const incoming = Array.isArray(data) ? data : (data.events || []);
-        if (!incoming.length) { reject(new Error('No events found in file')); return; }
-        const existing = getEvents();
-        const existingIds = new Set(existing.map(e => e.id));
-        const merged = [...existing, ...incoming.filter(e => !existingIds.has(e.id))];
-        merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        localStorage.setItem(EVENTS_KEY, JSON.stringify(merged));
-        resolve(incoming.length);
+        const events = Array.isArray(data) ? data : (data.events || []);
+        if (!events.length) { reject(new Error('No events found in file')); return; }
+        const typeCounts = {};
+        events.forEach(ev => { typeCounts[ev.type] = (typeCounts[ev.type] || 0) + 1; });
+        resolve({ events, typeCounts });
       } catch {
         reject(new Error('Invalid JSON file'));
       }
@@ -90,8 +88,22 @@ export function importJSON(file) {
   });
 }
 
-export function exportCSV() {
-  const events = getEvents();
+// Merge only selected types from parsed events into local storage
+export function importFiltered(incomingEvents, selectedTypes) {
+  const existing = getEvents();
+  const existingIds = new Set(existing.map(e => e.id));
+  const toAdd = incomingEvents.filter(e =>
+    selectedTypes.includes(e.type) && !existingIds.has(e.id)
+  );
+  const merged = [...existing, ...toAdd];
+  merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  localStorage.setItem(EVENTS_KEY, JSON.stringify(merged));
+  return toAdd.length;
+}
+
+export function exportCSV(selectedTypes) {
+  const allEvents = getEvents();
+  const events = selectedTypes ? allEvents.filter(e => selectedTypes.includes(e.type)) : allEvents;
   const rows = [
     ['Date', 'Time', 'Type', 'Feed Type', 'Side', 'Quantity (ml)', 'Duration (min)', 'Burped',
      'Poop Color', 'Texture', 'Sleep Duration (min)', 'Wash Type', 'Rash Level', 'Ointment', 'Ointment Name', 'Notes'],
@@ -121,8 +133,10 @@ export function exportCSV() {
   download(csv, `avika-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
 }
 
-export function exportJSON() {
-  const data = { exportedAt: new Date().toISOString(), events: getEvents() };
+export function exportJSON(selectedTypes) {
+  const allEvents = getEvents();
+  const events = selectedTypes ? allEvents.filter(e => selectedTypes.includes(e.type)) : allEvents;
+  const data = { exportedAt: new Date().toISOString(), events };
   download(JSON.stringify(data, null, 2), `avika-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
 }
 
